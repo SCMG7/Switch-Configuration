@@ -1,0 +1,212 @@
+--Switch Configuration Cheat sheet 
+
+enable
+configure terminal        #RENAME THE SWITCH TO S1
+hostname S1
+
+interface gi0/1
+swicthport mode trunk     #SWITCH PORT GI0/1 TO TRUNK
+swicthport nonegotiate
+exit
+
+interface gi0/2
+swicthport mode trunk     #SWITCH PORT GI0/2 TO TRUNK 
+swicthport nonegotiate
+exit
+
+vlan 3                   #CREATE VLAN 3 AND NAME IT Management
+name Management
+
+interface vlan 3
+ip address 192.168.3.2 255.255.255.0
+no shutdown
+exit                     # ASSIGN A IP AND SUBNET MASK AND CHANGE THE STATE TO UP
+
+ip default-gateway 192.168.3.1    # GIVES THE SWITCH A DEFAULT GATEWAY
+
+vlan 10                  #CREATE VLAN 10 AND NAME IT TEAM1
+name Team1
+exit
+
+vlan 20                  #CREATE VLAN 20 AND NAME IT TEAM2
+name Team2
+exit
+
+line vty 0 15            #CREATES A PASSWORD FOR LINE 0-15 FOR LOGIN/REMOTE ACCESS/TELNET
+password cisco
+login
+transport input telnet
+exit
+
+interface fa0/1          #SETS PORT FA0/1 TO VLAN 10
+switchport mode access
+switchport access vlan 10
+exit
+
+interface fa0/13         #SETS PORT FA0/13 TO VLAN 10
+switchport mode access
+swicthport access vlan 10
+exit
+
+--SWITCH 2 CONFIG------------------------------------------
+
+enable                   #RENAME THE SWITCH TO S2
+configure terminal
+hostname S2
+
+interface gi0/1          #SWITCH PORT GI0/1 TO TRUNK
+swicthport mode trunk
+swicthport nonegotiate
+exit
+
+interface gi0/2          #SWITCH PORT GI0/2 TO TRUNK
+swicthport mode trunk
+swicthport nonegotiate
+exit
+
+vlan 3
+name Management          #CREATE VLAN 3 AND NAME IT MANAGEMENT
+
+interface vlan 3
+ip address 192.168.3.4 255.255.255.0
+no shutdown              #GIVE VLAN 3 A IP ADDRESS AND SUBNETMASK AND TURN STATE TO UP
+exit
+
+ip default-gateway 192.168.3.1    #ASSIGN DEFAULT GATEWAY
+
+vlan 10                   
+name Team1
+exit                     #CRAETE VLAN 10 AND NAME IT TEAM1
+
+vlan 20
+name Team2               #CREATE VLAN 20 AND NAME IT TEAM2
+exit
+
+line vty 0 15
+password cisco           #ALL ACCESS FROM LINES 0-15 REQUIRE A PASSWORD 
+login
+transport input telnet
+exit
+
+interface fa0/3          #ASSIGNS PORT FA0/3 TO VLAN 3
+switchport mode access
+switchport access vlan 3
+exit
+
+interface fa0/2          #ASSIGNS PORT FA0/2 TO VLAN 10
+switchport mode access
+swicthport access vlan 10
+exit
+
+interface fa/04
+switchport mode access   #ASSIGNS PORT FA0/4 TO VLAN 20
+switchport access vlan 20
+exit
+
+--SWITCH 3 CONFIG------------------------------------------
+
+enable                   #RENAME SWITCH S3
+configure terminal
+hostname S3
+
+interface gi0/1
+swicthport mode trunk    #SWITCHS PORT GI0/1 TO TRUNK
+swicthport nonegotiate
+exit
+
+interface gi0/2
+swicthport mode trunk    #SWITCHS PORT GI0/2 TO TRUNK
+swicthport nonegotiate
+exit
+
+vlan 3
+name Management          #CREATES VLAN 3 AND NAMES IT MANAGEMENT
+
+interface vlan 3
+ip address 192.168.3.3 255.255.255.0
+no shutdown              #GIVES VLAN 3 A IP ADDRESS AND SUBNET MASK AND TURNS STATE TO UP
+exit
+
+ip default-gateway 192.168.3.1  #GIVES THE SWITCH A DEFAULT GATEWAY
+
+vlan 10                  #CREATES VLAN 10 AND NAMES IT TEAM1
+name Team1
+exit
+
+vlan 20
+name Team2
+exit                     #CREATE VLAN 20 AND NAME IT TEAM2
+
+line vty 0 15
+password cisco           #CREATES A PASSWORD FOR ALL LINE FROM 0-15 FOR ACCESS 
+login
+transport input telnet
+exit
+
+interface fa0/2          #ASSIGNS PORT FA0/2 TO VLAN 20
+switchport mode access
+switchport access vlan 20
+exit
+
+interface fa0/14
+switchport mode access   #ASSIGNS PORT FA0/14 TO VLAN 20
+swicthport access vlan 20
+exit
+
+
+
+--InterVLAN Router CONFIG------------------------------------------
+
+enable
+configure terminal       #RENAMES ROUTER InterVLAN 
+hostname InterVLAN
+
+interface gi0/0
+ip address 192.168.10.1 255.255.255.255.0
+no shutdown             #ASSIGNS PORT GO0/0 A IP ADDRESS AND TURNS STATE TO UP
+exit
+
+interface gi0/2
+ip address 192.168.20.1 255.255.255.255.0
+no shutdown
+exit
+
+interface gi0/1
+ip address 10.0.0.1 255.255.255.255.0
+no shutdown
+exit
+
+line vty 0 15          #CREATES A PASSWORD FOR ACCESS
+password cisco
+login
+transport input telnet
+exit
+
+
+
+--STATIC ROUTING----------------------------------------------------
+
+enable
+conf t                                     
+ip route 10.0.2.0 255.255.255.0 10.0.7.2   #DESTINATION-----SUBNETMASK----NEXT ROUTER(MATE)
+
+router rip -> redistribute static ###
+
+
+--DYNAMIC ROUTING-----------------------------------------------------
+
+enable 
+conf t
+router rip
+version 2                      #CONFIGURATION OF RIP (INTERIER PROTOCOL
+network 10.0.0.0
+no auto-summary
+exit
+
+
+ip dhcp excluded-address 192.168.3.1 192.168.3.10     #EXLUDED IP ADDRESS FROM 3.1 - 3.10
+
+ip dhcp pool 'nameCOMPUTING'
+network 192.168.3.0 255.255.255.0    #AUTO HAND OUT OF IP ADDRESS TO PC
+default-router 192.168.3.1
+exit
